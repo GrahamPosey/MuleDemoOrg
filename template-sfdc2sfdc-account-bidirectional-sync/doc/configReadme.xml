@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<configuration>
+	<placeholders>
+		<placeholder id="template_name">Salesforce to Salesforce Account Bidirectional Synchronization</placeholder>
+	</placeholders>
+	<sections>
+		<section id="use_case">
+<![CDATA[
+This template provdes an online bidirectional sync of accounts between two Salesforce instances with ability to specify filtering criteria.
+The main behavior of this template is fetching data for changes (new or modified accounts) using the scheduler or the HTTP component that have occurred in any of the Salesforce instances during a certain defined period of time. For those accounts that both have not been updated yet, the integration triggers an upsert (update or create depending the case) taking the last modification as the one that should be applied.
+
+]]>		
+		</section>
+		<section id="considerations">
+<![CDATA[
+To make this template run, there are certain preconditions that must be considered. All of them deal with the preparations in both, that must be made for all to run smoothly.
+Failing to do so can lead to unexpected behavior of the template.
+
+]]>
+		</section>
+		<section id="run_it">
+<![CDATA[
+To have your application up and running, you just need to complete two simple steps:
+
+ 1. Configure the application properties.
+ 2. Run it on premises or in CloudHub.
+]]>
+		</section>
+		<section id="running_on_cloudhub">
+<![CDATA[
+To create your application on CloudHub, go to Deployment > Advanced to set all environment variables detailed in "Properties to Configure" as well as the **mule.env**. 
+]]>
+		</section>
+		<section id="default_running_on_standalone">
+<![CDATA[
+Fill in all properties in one of the property files, for example in mule.dev.properties, and run your app with the corresponding environment variable to use it. To follow the example, this is `mule.env=dev`.
+]]>
+		</section>
+		<section id="application_configuration">
+<![CDATA[
+#### Application Configuration
+
++ http.port `9090`
+
++ scheduler.frequency `10000`  
+This is the milliseconds that runs between two different checks for updates in either Salesforce instance.
+
++ scheduler.startDelay `0`
+
++ watermark.default.expression `2018-02-25T11:00:00.000Z`  
+This property is an important one, as it configures what should be the start point of the synchronization. If the use case includes synchronization of every 
+account created from the beginning of time, you should use a date previous to any account creation (perhaps `1900-01-01T08:00:00.000Z` is a good choice). 
+If you want to synchronize the accounts created from now on, you should use a default value according to that requirement (for example, 
+if today is April 21, 2018 and eleven o'clock in London, then you could use the following value `2018-04-21T11:00:00.000Z`).
+
++ page.size `1000`
+
++ trigger.policy `push` | `poll`
+**Note:** The property **trigger.policy** can take any of the three following values:
++ **empty_value**: If the property has no value assigned to it, the application does nothing to the account.
++ **poll**: The Scheduler trigger flow to use.
++ **push**: The Push Notification trigger flow to use.
+
+
+#### SalesForce Connector Configuration for Company A
+
++ sfdc.a.username `aunt.eater@example.com`
++ sfdc.a.password `G0ttaF1ndTh3m`
++ sfdc.a.securityToken `avsfwCUl7apQs56Xq2AKi3X`
++ sfdc.a.integration.user.id `A0ed000BO9T`
+
+	**Note:** To find  the correct *sfdc.a.integration.user.id* value, refer to the example project "Salesforce Data Retrieval" in Anypoint Exchange.
+
+#### SalesForce Connector Configuration for Company B
+
++ sfdc.b.username `polly.hedra@example.com`
++ sfdc.b.password `WootWoot99^^`
++ sfdc.b.securityToken `ces56arl7apQs56XTddf34X`
++ sfdc.b.integration.user.id `B0ed000BO9T`
+
+	**Note:** To find the correct *sfdc.b.integration.user.id* value, refer to the example project "Salesforce Data Retrieval" in Anypoint Exchange.
+]]>
+		</section>
+		<section id="api_calls">
+		<![CDATA[
+Not relevant for this use case.
+]]> 
+		</section>
+		<section id="default_endpoints_xml">
+		<![CDATA[
+This file contains each inbound and outbound endpoint for your integration app. 
+In this template, this file contains a scheduler endpoint that queries Salesforce "A" and Salesforce "B" for updates using the watermark and HTTP endpoint for push operation.
+]]>
+		</section>
+		<section id="default_business_logic_xml">
+		<![CDATA[
+This file holds the functional aspect of the template. Its main component is a batch job, and it includes steps for both executing the synchronization from Salesforce "A" to Salesforce "B", and the other way around.
+]]>
+		</section>
+		<section id="default_error_handling_xml">
+		<![CDATA[
+This file is for how to handle your integration, and reacts depending on the different exceptions. 
+This file provides error handling referenced by the scheduler and a push flow in the endpoints XML file.]]>
+		</section>
+	</sections>
+</configuration>
